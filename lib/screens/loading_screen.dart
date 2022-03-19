@@ -1,6 +1,11 @@
+import 'package:aclima_weather/screens/location_screen.dart';
 import 'package:aclima_weather/services/location.dart';
+import 'package:aclima_weather/services/networking.dart';
+import 'package:aclima_weather/services/weather.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+// const apiKey = '4232afa01405fb806311dff86dc0143a';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -13,37 +18,44 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getLocationData();
     // getData();
   }
 
-  void getLocation() async {
-    Location location = Location();
-    location.getCurrentLocation();
-    print(location.latitude);
-    print(location.longitude);
-  }
+// https://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=4232afa01405fb806311dff86dc0143a
+  // void getLocationData() async {
+  //   Location location = Location();
+  //   await location.getCurrentLocation();
 
-  Future<void> getData() async {
-    http.Response response = await http.get(Uri.parse(
-        'https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=e5490fa61f15ded1b1f1473444f2a53a'));
-    if (response.statusCode == 200) {
-      String data = response.body;
-      print(data);
-    } else {
-      print(response.statusCode);
-    }
-  }
+  //   NetworkHelper networkHelper = NetworkHelper(
+  //       'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$apiKey&units=metric');
 
-  @override
-  void deactivate() {
-    super.deactivate();
-    print('deactive ');
+  //   var weatherData = await networkHelper.getData();
+  //   print(weatherData);
+
+  //   Navigator.push(context, MaterialPageRoute(builder: (context) {
+  //     return LocationScreen(
+  //       locationWeather: weatherData,
+  //     );
+  //   }));
+  // }
+  void getLocationData() async {
+    var weatherData = await WeatherModel().getLocationWeather();
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return LocationScreen(
+        locationWeather: weatherData,
+      );
+    }));
   }
 
   @override
   Widget build(BuildContext context) {
-    getData();
-    return const Scaffold();
+    return const Scaffold(
+      body: Center(
+          child: SpinKitDoubleBounce(
+        color: Colors.white,
+        size: 100.0,
+      )),
+    );
   }
 }
